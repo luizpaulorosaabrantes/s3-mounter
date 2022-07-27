@@ -1,6 +1,10 @@
 FROM alpine:3.3
 
-ENV MNT_POINT /var/s3fs
+LABEL org.opencontainers.image.source https://github.com/luizpaulorosaabrantes/s3-mounter
+
+ENV MNT_POINT /var/s3
+
+VOLUME /var/s3
 
 ARG S3FS_VERSION=v1.86
 
@@ -16,7 +20,9 @@ RUN apk --update --no-cache add fuse alpine-sdk automake autoconf libxml2-dev fu
     rm -rf /var/cache/apk/*; \
     apk del git automake autoconf;
 
-RUN mkdir -p "$MNT_POINT"
+# RUN mkdir -p "$MNT_POINT"
+
+RUN sed -i s/"#user_allow_other"/"user_allow_other"/g /etc/fuse.conf
 
 COPY run.sh run.sh
 CMD ./run.sh

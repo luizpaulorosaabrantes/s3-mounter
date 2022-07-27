@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: alpine1
+spec:
+  containers:
+  - name: s3fuse
+    image: ghcr.io/luizpaulorosaabrantes/s3-mounter:0.1.1
+    lifecycle:
+      preStop:
+        exec:
+          command: ["/bin/sh","-c","umount -f /var/s3"]         
+    securityContext:
+      privileged: true
+      # capabilities:
+      #   add:
+      #   - SYS_ADMIN       
+    envFrom:
+    - configMapRef:
+        name: s3-config
+    volumeMounts:
+    - name: devfuse
+      mountPath: /dev/fuse
+    - name: mntdatas3fs
+      mountPath: /var/s3
+      mountPropagation: Bidirectional
+
+  - image: alpine:latest
+    name: s3-test-container
+    command:
+      - /bin/sh
+      - "-c"
+      - "sleep 60m"
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: mntdatas3fs
+      mountPath: /var/s3
+      mountPropagation: Bidirectional
+  volumes:
+  - name: devfuse
+    hostPath:
+      path: /dev/fuse
+
+  - name: mntdatas3fs
+    emptyDir: {}  
+    # hostPath:
+    #   path: /mnt/data-s3-fs

@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  developer:
+    image: ghcr.io/luizpaulorosaabrantes/s3-mounter:0.1.2
+    container_name: s3-mounter
+    build:
+      context: .
+      dockerfile: Dockerfile
+      no_cache: true

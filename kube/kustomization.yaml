@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: default
+resources:
+- daemonset.yaml
+# - example_pod.yaml
+
+commonLabels:
+  app: s3-provider
+
+configMapGenerator:
+- name: s3-config
+  options:
+    disableNameSuffixHash: true
+  envs:
+    - s3.env
